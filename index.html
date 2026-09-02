@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Mentoría - Observadores</title>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #0f172a;
+            --primary-light: #3b82f6;
+            --primary-accent: #2563eb;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-green-bg: #ecfdf5;
+            --accent-amber: #f59e0b;
+            --accent-amber-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Modal Auth Container */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .auth-card .logo-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-card .logo-header i {
+            font-size: 2.5rem;
+            color: var(--primary-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-card h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .auth-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .auth-tab-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 270px;
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 1.25rem;
+        }
+
+        .brand-header i {
+            font-size: 1.8rem;
+            color: var(--primary-light);
+        }
+
+        .brand-header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .brand-header small {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: block;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        nav button i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        nav button:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        nav button.active {
+            background-color: var(--primary-accent);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .user-info-panel {
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.85rem;
+        }
+
+        .user-profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .avatar-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .user-details {
+            overflow: hidden;
+        }
+
+        .user-details .name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #f8fafc;
+        }
+
+        .user-details .role-tag {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            margin-top: 0.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            overflow-y: auto;
+            max-width: 1400px;
+        }
+
+        header.page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header.page-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        header.page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* UI Components */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.75rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            color: var(--primary);
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Hero Banner Presentation */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2.2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: "\f753";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            font-size: 12rem;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .hero-banner h3 {
+            font-size: 1.6rem;
+            color: white;
+            margin-bottom: 0.6rem;
+        }
+
+        .hero-banner p {
+            font-size: 1rem;
+            opacity: 0.95;
+            line-height: 1.6;
+            max-width: 900px;
+        }
+
+        .pill-container {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1.25rem;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1.2rem;
+        }
+
+        .pillar-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 1.2rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-light);
+            transition: transform 0.2s;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .pillar-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pillar-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #ffffff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        button.btn-primary {
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: fit-content;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--primary);
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3);
+        }
+
+        /* Table Design */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: white;
+        }
+
+        th, td {
+            padding: 0.9rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f1f5f9;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: var(--accent-green-bg); color: #065f46; border: 1px solid #a7f3d0; }
+        .badge-warning { background: var(--accent-amber-bg); color: #92400e; border: 1px solid #fde68a; }
+        .badge-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .badge-accent { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+
+        /* Sync Notice Banner */
+        .sync-notice {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .only-profesor { display: none; }
+
+        /* ── Calendario ── */
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .cal-nav h3 { margin: 0; font-size: 1.15rem; color: var(--primary); font-weight: 700; }
+        .cal-nav-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.45rem 0.9rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: background 0.15s;
+        }
+        .cal-nav-btn:hover { background: #e2e8f0; }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .cal-day-name {
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 0.4rem 0;
+            letter-spacing: 0.5px;
+        }
+        .cal-cell {
+            min-height: 80px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.5rem;
+            position: relative;
+            transition: background 0.15s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .cal-cell.other-month { opacity: 0.35; }
+        .cal-cell.today { border-color: var(--primary-light); background: #eff6ff; }
+        .cal-cell.has-event { background: #fff; }
+        .cal-cell-num {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .cal-cell.today .cal-cell-num { color: var(--primary-accent); }
+        .cal-events-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            flex: 1;
+        }
+        .cal-event {
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 2px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            max-width: 100%;
+            display: block;
+            border-left: 3px solid transparent;
+        }
+        /* Clases de fallback para colores predeterminados */
+        .cal-event.sesion   { background: #dbeafe; color: #1e40af; border-left-color: #3b82f6; }
+        .cal-event.examen   { background: #fef9c3; color: #854d0e; border-left-color: #eab308; }
+        .cal-event.minitest { background: #dcfce7; color: #166534; border-left-color: #22c55e; }
+        .cal-event.otro     { background: #f3e8ff; color: #6b21a8; border-left-color: #a855f7; }
+
+        /* ── Agenda del Profesor ── */
+        .agenda-banner {
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.2rem 1.6rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+        }
+        .agenda-banner i { font-size: 1.6rem; opacity: 0.9; }
+        .agenda-banner strong { font-size: 1rem; display: block; }
+        .agenda-banner span { font-size: 0.85rem; opacity: 0.85; }
+
+        .borrador-card {
+            background: #faf5ff;
+            border: 1.5px dashed #c4b5fd;
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+        .borrador-card:hover { background: #f3e8ff; border-color: #a78bfa; }
+        .borrador-icon {
+            width: 38px; height: 38px; border-radius: 8px;
+            background: #ede9fe; color: #6d28d9;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .borrador-info { flex: 1; min-width: 0; }
+        .borrador-info .b-title {
+            font-weight: 700; font-size: 0.92rem; color: #4c1d95;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .borrador-info .b-meta {
+            font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;
+        }
+        .borrador-info .b-desc {
+            font-size: 0.82rem; color: #5b21b6; margin-top: 0.3rem;
+            font-style: italic;
+        }
+        .borrador-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+        .btn-publicar {
+            padding: 0.35rem 0.75rem;
+            background: var(--accent-green-bg);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-publicar:hover { background: #10b981; color: white; border-color: #10b981; }
+        .btn-del-borrador {
+            padding: 0.35rem 0.6rem;
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-del-borrador:hover { background: var(--danger); color: white; }
+
+        .estado-badge {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.2rem 0.55rem; border-radius: 5px;
+            font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .estado-idea     { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+        .estado-plan     { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .estado-listo    { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+
+        /* Fecha editable inline en tabla de tareas */
+        .fecha-editable {
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 0.25rem 0.4rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text);
+            transition: all 0.15s;
+            width: auto;
+        }
+        .fecha-editable:hover {
+            border-color: var(--primary-light);
+            background: #eff6ff;
+        }
+        .fecha-editable:focus {
+            border-color: var(--primary-light);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+            outline: none;
+        }
+
+        /* Fecha editable en borradores */
+        .bor-fecha-editable {
+            border: 1px dashed #c4b5fd;
+            border-radius: 5px;
+            padding: 0.15rem 0.35rem;
+            font-size: 0.78rem;
+            cursor: pointer;
+            background: transparent;
+            color: #5b21b6;
+            transition: all 0.15s;
+        }
+        .bor-fecha-editable:hover  { background: #ede9fe; border-style: solid; }
+        .bor-fecha-editable:focus  { outline: none; border-color: #7c3aed; background: white; }
+
+        /* Cal borradores */
+        .cal-event.borrador { background: #ede9fe; color: #5b21b6; border-left: 2px solid #7c3aed; }
+        .agd-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+        .agd-cal-cell {
+            min-height: 70px; background: #f9f7ff; border: 1px solid #e9d5ff;
+            border-radius: 7px; padding: 0.35rem 0.4rem;
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+        .agd-cal-cell.other-month { opacity: 0.3; }
+        .agd-cal-cell.today { border-color: #7c3aed; background: #f3e8ff; }
+        .agd-cal-cell-num { font-size: 0.78rem; font-weight: 600; color: #6d28d9; margin-bottom: 3px; flex-shrink: 0; }
+        .agd-events-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex: 1; }
+        .agd-ev {
+            font-size: 0.68rem; font-weight: 600; border-radius: 3px;
+            padding: 1px 4px; background: #ede9fe;
+            color: #5b21b6; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; cursor: pointer; max-width: 100%; display: block;
+            border-left: 2px solid #7c3aed;
+        }
+        .agd-ev.listo { background: #dcfce7; color: #166534; border-left-color: #22c55e; }
+        .agd-ev.plan  { background: #dbeafe; color: #1e40af; border-left-color: #3b82f6; }
+
+        /* ── Modal Creación Rápida desde Calendario ── */
+        #qc-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.55);
+            backdrop-filter: blur(3px);
+            z-index: 500;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        #qc-overlay.open { display: flex; }
+
+        #qc-modal {
+            background: var(--surface);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease;
+        }
+        #qc-modal .qc-header {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 1.1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #qc-modal .qc-header h3 { font-size: 1rem; margin: 0; display:flex; align-items:center; gap:0.5rem; }
+        #qc-modal .qc-header .qc-fecha-badge {
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        #qc-modal .qc-close {
+            background: none; border: none; color: white; font-size: 1.2rem;
+            cursor: pointer; opacity: 0.8; padding: 0.2rem;
+        }
+        #qc-modal .qc-close:hover { opacity: 1; }
+        #qc-modal .qc-body { padding: 1.2rem 1.4rem; }
+
+        .qc-section-label {
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 0.6rem;
+        }
+        .qc-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1.1rem;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .qc-hist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f8fafc;
+        }
+        .qc-hist-item:hover {
+            background: #eff6ff;
+            border-color: var(--primary-light);
+        }
+        .qc-hist-icon {
+            width: 32px; height: 32px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; flex-shrink: 0;
+            background: #dbeafe; color: #1e40af;
+        }
+        .qc-hist-icon.examen   { background: #fef9c3; color: #854d0e; }
+        .qc-hist-icon.minitest { background: #dcfce7; color: #166534; }
+        .qc-hist-icon.otro     { background: #f3e8ff; color: #6b21a8; }
+        .qc-hist-title { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+        .qc-hist-sub   { font-size: 0.76rem; color: var(--text-muted); margin-top: 0.1rem; }
+        .qc-hist-arrow { margin-left: auto; color: var(--text-muted); font-size: 0.85rem; }
+
+        .qc-divider {
+            display: flex; align-items: center; gap: 0.7rem;
+            margin-bottom: 1rem; color: var(--text-muted); font-size: 0.78rem;
+        }
+        .qc-divider::before, .qc-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .qc-new-form { display: flex; flex-direction: column; gap: 0.75rem; }
+        .qc-row { display: flex; gap: 0.6rem; }
+        .qc-row > * { flex: 1; }
+        .qc-footer {
+            padding: 0.9rem 1.4rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+        }
+        .btn-secondary {
+            background: #f1f5f9; border: 1px solid var(--border);
+            color: var(--text); border-radius: 8px;
+            padding: 0.6rem 1.1rem; cursor: pointer;
+            font-weight: 600; font-size: 0.88rem; transition: all 0.15s;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        /* Celdas clicables del calendario cuando es profesor */
+        .cal-cell.clickable { cursor: pointer; }
+        .cal-cell.clickable:hover { background: #eff6ff; border-color: var(--primary-light); }
+            display: none;
+            position: fixed;
+            background: var(--primary-dark);
+            color: #f8fafc;
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            max-width: 240px;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            pointer-events: none;
+        }
+        .cal-tooltip.visible { display: block; }
+        .cal-tooltip strong { color: #93c5fd; }
+
+        /* ── Paleta de colores por tipo de tarea ── */
+        .tipo-color-row {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.7rem 0; border-bottom: 1px solid var(--border);
+        }
+        .tipo-color-row:last-child { border-bottom: none; }
+        .tipo-color-preview {
+            width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0;
+            border: 2px solid rgba(0,0,0,0.08);
+        }
+        .tipo-color-label { flex: 1; font-weight: 600; font-size: 0.88rem; color: var(--text); }
+        .swatches { display: flex; gap: 5px; flex-wrap: wrap; }
+        .swatch {
+            width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+            border: 2px solid transparent; transition: transform 0.12s;
+            flex-shrink: 0;
+        }
+        .swatch:hover { transform: scale(1.25); }
+        .swatch.active { border-color: #0f172a; box-shadow: 0 0 0 1px white inset; }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Login / Registro -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="logo-header">
+                <i class="fa-solid fa-cloud-sun-rain"></i>
+                <h2>Mentoría</h2>
+                <p>Preparación de Oposiciones a Observadores</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login-btn" onclick="toggleAuthForm('login')">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+                <button class="auth-tab-btn" id="tab-register-btn" onclick="toggleAuthForm('register')">
+                    <i class="fa-solid fa-user-plus"></i> Registrarse
+                </button>
+            </div>
+
+            <!-- Formulario Iniciar Sesión -->
+            <form id="form-login" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="login-email" placeholder="ejemplo@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Entrar a la plataforma
+                </button>
+            </form>
+
+            <!-- Formulario Registro -->
+            <form id="form-register" onsubmit="handleRegister(event)" style="display: none;">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="reg-email" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-pass" placeholder="••••••••" required>
+                </div>
+                <div class="form-group" id="group-perfil">
+                    <label>Perfil Científico / Nivel de Base</label>
+                    <input type="text" id="reg-perfil" placeholder="Ej. Grado en Física, Ciencias, Sin base...">
+                </div>
+                <div class="form-group" id="group-tel">
+                    <label>Teléfono (WhatsApp de contacto)</label>
+                    <input type="tel" id="reg-tel" placeholder="600000000">
+                </div>
+                <!-- Campo oculto: solo visible si el usuario activa el modo profesor -->
+                <div class="form-group" id="group-codigo-prof" style="display:none;">
+                    <label style="color:var(--danger)"><i class="fa-solid fa-shield-halved"></i> Código de acceso del mentor</label>
+                    <input type="password" id="reg-codigo-prof" placeholder="Código privado del mentor">
+                    <small style="color:var(--text-muted); font-size:0.78rem;">Solo el mentor conoce este código.</small>
+                </div>
+                <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-top:-0.3rem;">
+                    ¿Eres el mentor? <button type="button" onclick="toggleModoProfesor()" id="btn-modo-prof" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:0.8rem;text-decoration:underline;padding:0;">Acceder como mentor</button>
+                </p>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-user-check"></i> Crear Cuenta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Barra lateral de navegación -->
+    <aside>
+        <div>
+            <div class="brand-header">
+                <i class="fa-solid fa-cloud-bolt"></i>
+                <div>
+                    <h1>Mentoría</h1>
+                    <small>Observador Meteorológico</small>
+                </div>
+            </div>
+            <nav id="sidebar-nav">
+                <button class="nav-btn" id="btn-nav-presentacion" onclick="switchTab(event, 'presentacion')">
+                    <i class="fa-solid fa-graduation-cap"></i> Presentación
+                </button>
+                <button class="nav-btn only-profesor" id="btn-nav-dashboard" onclick="switchTab(event, 'dashboard')">
+                    <i class="fa-solid fa-chart-pie"></i> Panel General
+                </button>
+                <button class="nav-btn only-profesor" id="btn-nav-alumnos" onclick="switchTab(event, 'alumnos')">
+                    <i class="fa-solid fa-users"></i> Lista de Alumnos
+                </button>
+                <button class="nav-btn" id="btn-nav-tareas" onclick="switchTab(event, 'tareas')">
+                    <i class="fa-solid fa-calendar-check"></i> Mis Tareas
+                </button>
+                <button class="nav-btn" id="btn-nav-calendario" onclick="switchTab(event, 'calendario')">
+                    <i class="fa-solid fa-calendar-days"></i> Calendario
+                </button>
+                <button class="nav-btn only-profesor" id="btn-nav-agenda-profesor" onclick="switchTab(event, 'agenda-profesor')">
+                    <i class="fa-solid fa-note-sticky"></i> Mi Agenda
+                </button>
+                <button class="nav-btn only-profesor" id="btn-nav-pagos" onclick="switchTab(event, 'pagos')">
+                    <i class="fa-solid fa-credit-card"></i> Pagos y Tarifas
+                </button>
+                <button class="nav-btn" id="btn-nav-materiales" onclick="switchTab(event, 'materiales')">
+                    <i class="fa-solid fa-folder-open"></i> Recursos y Teoría
+                </button>
+            </nav>
+        </div>
+
+        <div class="user-info-panel">
+            <div class="user-profile-summary">
+                <div class="avatar-circle" id="user-avatar">U</div>
+                <div class="user-details">
+                    <div class="name" id="user-display-name">-</div>
+                    <span class="role-tag" id="user-display-role">-</span>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main>
+        <div class="sync-notice">
+            <i class="fa-solid fa-arrows-rotate fa-spin"></i>
+            <span>Sincronización en tiempo real habilitada mediante Google Sheets API.</span>
+        </div>
+
+        <!-- Vista Presentación (Pública / Alumnos) -->
+        <section id="presentacion" class="tab-content active">
+            <div class="hero-banner">
+                <h3>¡Bienvenido/a a la Mentoría! Soy Alex 👋</h3>
+                <p>
+                    Graduado en Física, Observador de Meteorología y Diplomado en la OEP 2025.<br>
+                    Esta plataforma está diseñada para acompañarte paso a paso durante tu preparación con una estrategia directa, práctica y sin rodeos.
+                </p>
+                <div class="pill-container">
+                    <span class="pill"><i class="fa-solid fa-bolt"></i> Método: Teoría Inversa</span>
+                    <span class="pill"><i class="fa-solid fa-clock"></i> Sesiones de 1h - 1,25h</span>
+                    <span class="pill"><i class="fa-solid fa-comments"></i> Soporte en WhatsApp &lt;24h</span>
+                    <span class="pill"><i class="fa-solid fa-bullseye"></i> Enfoque directo a Examen</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-brain"></i> El Método: Aprendizaje Basado en Exámenes (Teoría Inversa)</h3>
+                <p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+                    La gran mayoría de opositores pierde meses memorizando temarios abrumadores antes de enfrentarse al primer test. 
+                    Desde la primera semana trabajaremos con exámenes oficiales para localizar tus puntos débiles y afianzar la teoría exactamente donde la necesitas.
+                </p>
+                
+                <div class="pillars-grid">
+                    <div class="pillar-card">
+                        <h4><i class="fa-solid fa-file-signature"></i> 1. Exámenes Reales</h4>
+                        <p>Trabajo semanal con convocatorias oficiales (libre e interna) para dominar el formato exacto del tribunal.</p>
+                    </div>
+                    <div class="pillar-card">
+                        <h4><i class="fa-solid fa-magnifying-glass-chart"></i> 2. Diagnóstico de Errores</h4>
+                        <p>Mapeo detallado de fallos para identificar patrones y flaquezas conceptuales concretas.</p>
+                    </div>
+                    <div class="pillar-card">
+                        <h4><i class="fa-solid fa-book-bookmark"></i> 3. Teoría Híbrida</h4>
+                        <p>Generación de tu propia base de apuntes optimizada y adaptada a tus necesidades reales.</p>
+                    </div>
+                    <div class="pillar-card">
+                        <h4><i class="fa-solid fa-list-check"></i> 4. Refuerzo Específico</h4>
+                        <p>Envío semanal de minitests enfocados exclusivamente en afianzar tus bloques más débiles.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3><i class="fa-solid fa-calendar-days"></i> Tus Próximas Tareas</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Accede a tu pestaña de <strong>Mis Tareas</strong> para consultar las asignaciones y fechas de tus próximas sesiones.</p>
+                    <button class="btn-primary" onclick="switchTab(null, 'tareas')">
+                        <i class="fa-solid fa-arrow-right"></i> Ir a Mis Tareas
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-folder-open"></i> Materiales Disponibles</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">En la sección de <strong>Recursos y Teoría</strong> encontrarás exámenes oficiales, guías y minitests de apoyo.</p>
+                    <button class="btn-primary" onclick="switchTab(null, 'materiales')">
+                        <i class="fa-solid fa-arrow-right"></i> Ver Materiales
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel General (Solo Profesor) -->
+        <section id="dashboard" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Panel General de Administración</h2>
+                    <p>Resumen global de opositores, plazas y actividad reciente.</p>
+                </div>
+            </header>
+
+            <div class="grid">
+                <div class="card">
+                    <h3><i class="fa-solid fa-user-group"></i> Estado de Plazas</h3>
+                    <p style="margin-top: 0.5rem; font-size: 2.2rem; font-weight: 800; color: var(--primary);">
+                        <span id="num-alumnos">0</span> / 4 <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">(Promoción Lanzamiento)</span>
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Precio promocional: <strong>180 €/mes</strong> | Precio regular posterior: 240 €/mes.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-receipt"></i> Registro de Pagos</h3>
+                    <div id="resumen-ultimo-pago" style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        No hay pagos registrados aún.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-users"></i> Vista Rápida de Alumnos Registrados</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Email</th>
+                                <th>Perfil / Nivel</th>
+                                <th>Contacto</th>
+                                <th>Estado Pago</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-dashboard-alumnos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alumnos (Solo Profesor) -->
+        <section id="alumnos" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Gestión de Alumnos Registrados</h2>
+                    <p>Visualiza a todos los alumnos que se registren en la plataforma en tiempo real.</p>
+                </div>
+            </header>
+            
+            <div class="card">
+                <h3><i class="fa-solid fa-users-gear"></i> Lista Completa de Opositores</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Correo Electrónico</th>
+                                <th>Perfil Científico</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-alumnos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tareas / Calendario (Profesor y Alumno) -->
+        <section id="tareas" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Calendario y Cronograma de Tareas</h2>
+                    <p id="sub-tareas">Planificación de exámenes semanales, minitests y sesiones individuales (1h - 1,25h).</p>
+                </div>
+                <button class="btn-primary only-profesor" onclick="generarEnlaceSync()" style="white-space:nowrap;">
+                    <i class="fa-solid fa-share-nodes"></i> Compartir con alumnos
+                </button>
+            </header>
+
+            <!-- Banner de sync para alumnos -->
+            <div id="banner-sync-alumno" style="display:none; background:#fffbeb; border:1px solid #fde68a; color:#92400e; padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; display:none; align-items:center; gap:0.6rem; margin-bottom:1.2rem; flex-wrap:wrap;">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Para ver tus tareas y materiales, pega el <strong>enlace de sincronización</strong> que te mandó el mentor:</span>
+                <div style="display:flex; gap:0.5rem; flex:1; min-width:200px;">
+                    <input type="text" id="input-sync-code" placeholder="Pega aquí el código del mentor" style="flex:1; padding:0.35rem 0.6rem; font-size:0.85rem; border:1px solid var(--border); border-radius:6px;">
+                    <button onclick="importarCodigoSync()" style="padding:0.35rem 0.8rem; background:var(--primary-accent); color:white; border:none; border-radius:6px; cursor:pointer; font-size:0.85rem; font-weight:600;">Cargar</button>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card only-profesor" id="card-crear-tarea">
+                    <h3><i class="fa-solid fa-plus-circle"></i> Asignar Tarea o Sesión</h3>
+                    <form id="form-tarea" onsubmit="addTarea(event)">
+                        <div class="form-group">
+                            <label>Alumno Destinatario</label>
+                            <select id="tarea-alumno" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Actividad</label>
+                            <select id="tarea-tipo" onchange="toggleCustomTipo('tarea-tipo','tarea-tipo-custom')">
+                                <option value="Sesión Individual">Sesión Individual (1h - 1.25h)</option>
+                                <option value="Examen Oficial">Examen Oficial Semanal</option>
+                                <option value="Minitest Refuerzo">Minitest de Refuerzo</option>
+                                <option value="__custom__">✏️ Escribir tipo personalizado…</option>
+                            </select>
+                            <input type="text" id="tarea-tipo-custom" placeholder="Escribe el tipo de actividad…" style="display:none; margin-top:0.4rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Límite / Cita</label>
+                            <input type="date" id="tarea-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Detalles / Bloque Temático</label>
+                            <textarea id="tarea-desc" rows="2" placeholder="Ej. Diagnóstico de errores en Climatología"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-calendar-plus"></i> Programar Tarea
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3><i class="fa-solid fa-list-check"></i> Listado de Tareas Asignadas</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Alumno</th>
+                                    <th>Tipo de Actividad</th>
+                                    <th>Detalles / Instrucciones</th>
+                                    <th class="only-profesor">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-tareas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Calendario (Profesor y Alumno) -->
+        <section id="calendario" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Calendario de Citas y Sesiones</h2>
+                    <p>Visualiza de un vistazo todos los eventos programados del mes.</p>
+                </div>
+            </header>
+
+            <!-- Color palette (solo profesor) -->
+            <div class="card only-profesor" id="card-colores" style="display:none;">
+                <h3><i class="fa-solid fa-palette"></i> Colores por tipo de actividad</h3>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+                    Asigna un color a cada tipo de actividad. Se aplica en ambos calendarios.
+                </p>
+                <div id="lista-colores"></div>
+            </div>
+
+            <div class="card">
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" onclick="calCambiarMes(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="cal-titulo">—</h3>
+                    <button class="cal-nav-btn" onclick="calCambiarMes(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="cal-grid" id="cal-grid"></div>
+            </div>
+
+            <!-- Eventos del mes -->
+            <div class="card">
+                <h3><i class="fa-solid fa-list-ul"></i> Eventos de este mes</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Alumno / Destinatario</th>
+                                <th>Tipo</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cal-lista-eventos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tooltip flotante del calendario -->
+        <div class="cal-tooltip" id="cal-tooltip"></div>
+
+        <!-- ── Mi Agenda (Solo Profesor - BORRADOR PRIVADO) ── -->
+        <section id="agenda-profesor" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Mi Agenda Privada</h2>
+                    <p>Planificación en borrador — invisible para los alumnos hasta que la publiques.</p>
+                </div>
+            </header>
+
+            <div class="agenda-banner">
+                <i class="fa-solid fa-lock"></i>
+                <div>
+                    <strong>Espacio exclusivo del mentor</strong>
+                    <span>Todo lo que añadas aquí es un borrador privado. Puedes publicarlo en "Mis Tareas" cuando estés listo, o usarlo solo como recordatorio interno.</span>
+                </div>
+            </div>
+
+            <div class="grid">
+                <!-- Formulario de borrador -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-pencil"></i> Nuevo Borrador de Tarea</h3>
+                    <form id="form-borrador" onsubmit="addBorrador(event)">
+                        <div class="form-group">
+                            <label>Alumno Destinatario (orientativo)</label>
+                            <select id="bor-alumno"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Actividad</label>
+                            <select id="bor-tipo" onchange="toggleCustomTipo('bor-tipo','bor-tipo-custom')">
+                                <option value="Sesión Individual">Sesión Individual (1h - 1.25h)</option>
+                                <option value="Examen Oficial">Examen Oficial Semanal</option>
+                                <option value="Minitest Refuerzo">Minitest de Refuerzo</option>
+                                <option value="Nota Personal">Nota Personal / Recordatorio</option>
+                                <option value="__custom__">✏️ Escribir tipo personalizado…</option>
+                            </select>
+                            <input type="text" id="bor-tipo-custom" placeholder="Escribe el tipo de actividad…" style="display:none; margin-top:0.4rem;">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Prevista</label>
+                            <input type="date" id="bor-fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción / Notas internas</label>
+                            <textarea id="bor-desc" rows="2" placeholder="Ej. Repasar errores en Termodinámica antes de esta sesión"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado del borrador</label>
+                            <select id="bor-estado">
+                                <option value="idea">💡 Idea inicial</option>
+                                <option value="plan">📋 Planificado</option>
+                                <option value="listo">✅ Listo para publicar</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="background: #7c3aed;">
+                            <i class="fa-solid fa-plus"></i> Guardar Borrador
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Calendario de borradores -->
+                <div class="card">
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" onclick="agdCambiarMes(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h3 id="agd-titulo" style="color: #5b21b6;">—</h3>
+                        <button class="cal-nav-btn" onclick="agdCambiarMes(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="agd-cal-grid" id="agd-cal-grid"></div>
+                </div>
+            </div>
+
+            <!-- Lista de borradores -->
+            <div class="card">
+                <h3 style="color: #5b21b6;"><i class="fa-solid fa-list-check"></i> Borradores Guardados <span id="agd-count" style="font-size:0.85rem; font-weight:500; color:var(--text-muted);"></span></h3>
+                <div id="lista-borradores">
+                    <p style="color:var(--text-muted); font-size:0.9rem; padding:1rem 0;">No hay borradores aún. ¡Empieza a planificar!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pagos (Solo Profesor) -->
+        <section id="pagos" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Control de Cuotas y Pagos</h2>
+                    <p>Gestión mensual de los alumnos inscritos.</p>
+                </div>
+            </header>
+            <div class="card">
+                <h3><i class="fa-solid fa-money-bill-transfer"></i> Control de Mensualidades</h3>
+                <p style="margin-bottom: 1.2rem; font-size: 0.9rem; color: var(--text-muted);">
+                    <strong>Promoción Lanzamiento:</strong> 180 €/mes (Primeros 4 alumnos) | <strong>Precio Regular:</strong> 240 €/mes
+                </p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Mes</th>
+                                <th>Monto</th>
+                                <th>Método de Pago</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-pagos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Materiales (Profesor y Alumno) -->
+        <section id="materiales" class="tab-content">
+            <header class="page-header">
+                <div>
+                    <h2>Material Teórico y Repositorio</h2>
+                    <p>Acceso a exámenes oficiales, teoría híbrida adaptada y minitests.</p>
+                </div>
+            </header>
+
+            <div class="grid">
+                <div class="card only-profesor" id="card-crear-material">
+                    <h3><i class="fa-solid fa-upload"></i> Subir Recurso / Enlace</h3>
+                    <form id="form-material" onsubmit="addMaterial(event)">
+                        <div class="form-group">
+                            <label>Título del Material</label>
+                            <input type="text" id="mat-titulo" placeholder="Ej. Examen 2023 - Promoción Interna" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="mat-cat">
+                                <option value="Examen Oficial">Examen Oficial</option>
+                                <option value="Bibliografía">Asesoramiento Bibliográfico</option>
+                                <option value="Minitest">Minitest Específico</option>
+                                <option value="Apuntes">Teoría Híbrida Adaptada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Enlace al Documento (URL / Google Drive / PDF)</label>
+                            <input type="url" id="mat-url" placeholder="https://drive.google.com/..." required>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Publicar Recurso
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3><i class="fa-solid fa-book-open"></i> Biblioteca de Recursos</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Categoría</th>
+                                    <th>Enlace de Acceso</th>
+                                    <th class="only-profesor">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-materiales"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ── Modal Creación Rápida ── -->
+    <div id="qc-overlay" onclick="qcClickOutside(event)">
+        <div id="qc-modal">
+            <div class="qc-header">
+                <h3><i class="fa-solid fa-calendar-plus"></i> Crear tarea rápida</h3>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span class="qc-fecha-badge" id="qc-fecha-label">—</span>
+                    <button class="qc-close" onclick="qcClose()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="qc-body">
+                <!-- Historial -->
+                <div id="qc-hist-section">
+                    <div class="qc-section-label"><i class="fa-solid fa-clock-rotate-left"></i> Usados recientemente — clic para aplicar</div>
+                    <div class="qc-history-list" id="qc-hist-list"></div>
+                    <div class="qc-divider">o crea una nueva</div>
+                </div>
+
+                <!-- Formulario rápido -->
+                <div class="qc-new-form">
+                    <div class="qc-row">
+                        <div class="form-group" style="margin:0;">
+                            <label>Alumno</label>
+                            <select id="qc-alumno"></select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Tipo</label>
+                            <select id="qc-tipo" onchange="toggleCustomTipo('qc-tipo','qc-tipo-custom')">
+                                <option value="Sesión Individual">Sesión Individual</option>
+                                <option value="Examen Oficial">Examen Oficial</option>
+                                <option value="Minitest Refuerzo">Minitest de Refuerzo</option>
+                                <option value="__custom__">✏️ Personalizado…</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="text" id="qc-tipo-custom" placeholder="Escribe el tipo…" style="display:none;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Descripción (opcional)</label>
+                        <input type="text" id="qc-desc" placeholder="Ej. Diagnóstico Climatología">
+                    </div>
+                    <!-- Solo visible en modo borrador -->
+                    <div class="form-group" style="margin:0;" id="qc-estado-group">
+                        <label>Estado del borrador</label>
+                        <select id="qc-estado">
+                            <option value="idea">💡 Idea inicial</option>
+                            <option value="plan">📋 Planificado</option>
+                            <option value="listo">✅ Listo para publicar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="qc-footer">
+                <button class="btn-secondary" onclick="qcClose()">Cancelar</button>
+                <button class="btn-primary" onclick="qcGuardar()">
+                    <i class="fa-solid fa-calendar-plus"></i> Añadir al calendario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGeoQPv7oReWSDMTmkGqgbqzu2kMCmmIfh4w_eEB2AZ_vfwJmTLmEtiPLpLFicIBUy/exec";
+
+        // ── Código secreto del mentor (cámbialo por el tuyo) ──────────────
+        const CODIGO_MENTOR = "ALEX2025";
+        // ──────────────────────────────────────────────────────────────────
+
+        // Limpieza de datos obsoletos de versiones anteriores
+        (function limpiarDatosObsoletos() {
+            try {
+                const mats = JSON.parse(localStorage.getItem('app_materiales') || '[]');
+                const limpios = mats.filter(m => m.url !== 'https://www.aemet.es');
+                if (limpios.length !== mats.length) {
+                    localStorage.setItem('app_materiales', JSON.stringify(limpios));
+                }
+            } catch(e) {}
+        })();
+
+        // Inicializar datos base
+        let db = {
+            usuarios: JSON.parse(localStorage.getItem('app_usuarios')) || [
+                { nombre: "Alex (Profesor)", email: "alex@mentoria.es", pass: "1234", rol: "profesor", perfil: "Mentor", tel: "600000000" }
+            ],
+            currentUser: JSON.parse(localStorage.getItem('app_current_user')) || null,
+            alumnos: JSON.parse(localStorage.getItem('app_alumnos_cache')) || [],
+            tareas: JSON.parse(localStorage.getItem('app_tareas')) || [],
+            materiales: JSON.parse(localStorage.getItem('app_materiales')) || [],
+            borradores: JSON.parse(localStorage.getItem('app_borradores')) || [],
+            colores: JSON.parse(localStorage.getItem('app_colores')) || {}
+        };
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SINCRONIZACIÓN CON GOOGLE SHEETS
+        // El Google Apps Script debe devolver un objeto con este formato:
+        // { alumnos: [[nombre,email,perfil,tel],...], tareas: [...], materiales: [...] }
+        // Si sigue devolviendo solo el array de alumnos (formato antiguo), también funciona.
+        // Para el nuevo formato, añade en tu Apps Script:
+        //   if (e.parameter.action === 'getAll') {
+        //     return ContentService.createTextOutput(JSON.stringify({
+        //       alumnos: getAlumnos(),
+        //       tareas: getTareas(),
+        //       materiales: getMateriales()
+        //     })).setMimeType(ContentService.MimeType.JSON);
+        //   }
+        // ─────────────────────────────────────────────────────────────────────
+        async function loadAlumnosFromSheets() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("TU_URL")) return;
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getAll");
+                const data = await res.json();
+
+                // Soporte para formato nuevo { alumnos, tareas, materiales } y formato antiguo (array)
+                const rawAlumnos = Array.isArray(data) ? data : (data.alumnos || []);
+                const rawTareas = Array.isArray(data) ? null : (data.tareas || null);
+                const rawMateriales = Array.isArray(data) ? null : (data.materiales || null);
+
+                db.alumnos = rawAlumnos.map((row, index) => {
+                    const email = row[1];
+                    const existing = db.alumnos.find(a => a.email === email);
+                    return {
+                        id: index + 1,
+                        nombre: row[0],
+                        email: email,
+                        perfil: row[2],
+                        tel: row[3],
+                        pagoPagado: existing ? existing.pagoPagado : false,
+                        metodoPago: existing ? existing.metodoPago : 'Bizum'
+                    };
+                });
+
+                // Solo sobreescribe tareas y materiales si el script los devuelve
+                if (rawTareas) db.tareas = rawTareas;
+                if (rawMateriales) db.materiales = rawMateriales;
+
+                saveData();
+            } catch (err) {
+                console.error("Error al obtener datos de Sheets:", err);
+            }
+        }
+
+        // Guarda tareas en Sheets para que los alumnos puedan verlas
+        async function syncTareasToSheets() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("TU_URL")) return;
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveTareas', data: db.tareas })
+                });
+            } catch (err) {
+                console.error("Error al sincronizar tareas:", err);
+            }
+        }
+
+        // Guarda materiales en Sheets para que los alumnos puedan verlos
+        async function syncMaterialesToSheets() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("TU_URL")) return;
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveMateriales', data: db.materiales })
+                });
+            } catch (err) {
+                console.error("Error al sincronizar materiales:", err);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('app_usuarios', JSON.stringify(db.usuarios));
+            localStorage.setItem('app_current_user', JSON.stringify(db.currentUser));
+            localStorage.setItem('app_alumnos_cache', JSON.stringify(db.alumnos));
+            localStorage.setItem('app_tareas', JSON.stringify(db.tareas));
+            localStorage.setItem('app_materiales', JSON.stringify(db.materiales));
+            localStorage.setItem('app_borradores', JSON.stringify(db.borradores));
+            localStorage.setItem('app_colores', JSON.stringify(db.colores));
+            render();
+        }
+
+        function toggleAuthForm(mode) {
+            const formLogin = document.getElementById('form-login');
+            const formReg = document.getElementById('form-register');
+            const btnLogin = document.getElementById('tab-login-btn');
+            const btnReg = document.getElementById('tab-register-btn');
+
+            if (mode === 'login') {
+                formLogin.style.display = 'flex';
+                formReg.style.display = 'none';
+                btnLogin.classList.add('active');
+                btnReg.classList.remove('active');
+            } else {
+                formLogin.style.display = 'none';
+                formReg.style.display = 'flex';
+                btnReg.classList.add('active');
+                btnLogin.classList.remove('active');
+            }
+        }
+
+        let modoProfesorActivo = false;
+
+        function toggleModoProfesor() {
+            modoProfesorActivo = !modoProfesorActivo;
+            const grupoCodigoProf = document.getElementById('group-codigo-prof');
+            const btn = document.getElementById('btn-modo-prof');
+            if (modoProfesorActivo) {
+                grupoCodigoProf.style.display = 'flex';
+                btn.textContent = 'Cancelar acceso mentor';
+            } else {
+                grupoCodigoProf.style.display = 'none';
+                btn.textContent = 'Acceder como mentor';
+                document.getElementById('reg-codigo-prof').value = '';
+            }
+        }
+
+        function handleRoleChange(role) {
+            // Mantenida por compatibilidad, ya no se usa en el formulario
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const email  = document.getElementById('reg-email').value.trim();
+            const pass   = document.getElementById('reg-pass').value.trim();
+            const perfil = document.getElementById('reg-perfil').value.trim() || 'Sin especificar';
+            const tel    = document.getElementById('reg-tel').value.trim() || 'No proporcionado';
+
+            // Determinar rol
+            let rol = 'alumno';
+            if (modoProfesorActivo) {
+                const codigoIntroducido = document.getElementById('reg-codigo-prof').value.trim();
+                if (codigoIntroducido !== CODIGO_MENTOR) {
+                    alert('❌ Código de mentor incorrecto. Si eres alumno, registrate sin activar ese modo.');
+                    return;
+                }
+                rol = 'profesor';
+            }
+
+            if (db.usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                alert('El correo electrónico ya se encuentra registrado.');
+                return;
+            }
+
+            const newUser = { nombre, email, pass, rol, perfil, tel };
+            db.usuarios.push(newUser);
+
+            if (rol === 'alumno' && GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("TU_URL")) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ nombre, correo: email, perfil, telefono: tel })
+                    });
+                } catch (err) {
+                    console.error("Error al guardar en Sheets:", err);
+                }
+            }
+
+            db.currentUser = newUser;
+            document.getElementById('form-register').reset();
+            modoProfesorActivo = false;
+            document.getElementById('group-codigo-prof').style.display = 'none';
+            document.getElementById('btn-modo-prof').textContent = 'Acceder como mentor';
+            saveData();
+            await loadAlumnosFromSheets();
+            checkAuth();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
+
+            const user = db.usuarios.find(u => u.email.toLowerCase() === email && u.pass === pass);
+
+            if (!user) {
+                alert('Correo o contraseña incorrectos.');
+                return;
+            }
+
+            db.currentUser = user;
+            document.getElementById('form-login').reset();
+            saveData();
+            checkAuth();
+        }
+
+        function handleLogout() {
+            db.currentUser = null;
+            saveData();
+            checkAuth();
+        }
+
+        function checkAuth() {
+            const overlay = document.getElementById('auth-overlay');
+            if (!db.currentUser) {
+                overlay.style.display = 'flex';
+                return;
+            }
+
+            overlay.style.display = 'none';
+
+            document.getElementById('user-display-name').textContent = db.currentUser.nombre;
+            document.getElementById('user-display-role').textContent = db.currentUser.rol;
+            document.getElementById('user-avatar').textContent = db.currentUser.nombre.charAt(0).toUpperCase();
+
+            const profElements = document.querySelectorAll('.only-profesor');
+
+            if (db.currentUser.rol === 'profesor') {
+                profElements.forEach(el => el.style.display = 'block');
+                switchTab(null, 'dashboard');
+                // Ocultar banner de sync para el profesor
+                document.getElementById('banner-sync-alumno').style.display = 'none';
+            } else {
+                profElements.forEach(el => el.style.display = 'none');
+                switchTab(null, 'presentacion');
+                // Mostrar banner de sync para alumnos si no tienen datos
+                const banner = document.getElementById('banner-sync-alumno');
+                if (banner) banner.style.display = 'flex';
+            }
+
+            // Importar datos del enlace de sync si vienen en la URL
+            importarSyncDesdeURL();
+        }
+
+        // ── Sistema de Sincronización Profesor → Alumno ───────────────────
+        // El profesor genera un código que contiene tareas y materiales.
+        // Los alumnos lo pegan y sus datos se actualizan al instante.
+
+        function generarEnlaceSync() {
+            if (db.tareas.length === 0 && db.materiales.length === 0) {
+                alert('No hay tareas ni materiales que compartir aún.');
+                return;
+            }
+            const payload = { tareas: db.tareas, materiales: db.materiales };
+            const codigo = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            const url = window.location.href.split('#')[0] + '#sync=' + codigo;
+
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ Enlace de sincronización copiado al portapapeles.\n\nPégalo en WhatsApp o correo para tus alumnos. Al abrirlo, se actualizarán sus tareas y materiales automáticamente.');
+            }).catch(() => {
+                // Fallback si clipboard API no disponible
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('✅ Enlace copiado. Envíaselo a tus alumnos.');
+            });
+        }
+
+        function importarSyncDesdeURL() {
+            const hash = window.location.hash;
+            if (!hash.startsWith('#sync=')) return;
+            const codigo = hash.slice(6);
+            try {
+                const payload = JSON.parse(decodeURIComponent(escape(atob(codigo))));
+                if (payload.tareas)    db.tareas    = payload.tareas;
+                if (payload.materiales) db.materiales = payload.materiales;
+                saveData();
+                // Limpiar el hash sin recargar la página
+                history.replaceState(null, '', window.location.pathname);
+                // Ocultar el banner de sync si ya tiene datos
+                const banner = document.getElementById('banner-sync-alumno');
+                if (banner && (db.tareas.length > 0 || db.materiales.length > 0)) {
+                    banner.style.display = 'none';
+                }
+                if (db.currentUser && db.currentUser.rol !== 'profesor') {
+                    alert('✅ Datos sincronizados. Ya puedes ver tus tareas y materiales.');
+                }
+            } catch(err) {
+                console.error('Error al importar código de sync:', err);
+            }
+        }
+
+        function importarCodigoSync() {
+            const input = document.getElementById('input-sync-code');
+            let raw = (input.value || '').trim();
+            // Admite tanto la URL completa como solo el código base64
+            if (raw.includes('#sync=')) raw = raw.split('#sync=')[1];
+            if (!raw) { alert('Pega el enlace o código que te envió el mentor.'); return; }
+            try {
+                const payload = JSON.parse(decodeURIComponent(escape(atob(raw))));
+                if (payload.tareas)    db.tareas    = payload.tareas;
+                if (payload.materiales) db.materiales = payload.materiales;
+                saveData();
+                input.value = '';
+                const banner = document.getElementById('banner-sync-alumno');
+                if (banner) banner.style.display = 'none';
+                alert('✅ Sincronización completada. Ya puedes ver tus tareas y materiales.');
+            } catch(err) {
+                alert('❌ Código inválido. Asegúrate de pegar el enlace completo.');
+            }
+        }
+        // ── Fin Sistema de Sincronización ─────────────────────────────────
+
+        function switchTab(event, tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            if (event) {
+                event.currentTarget.classList.add('active');
+            } else {
+                const navBtn = document.getElementById(`btn-nav-${tabId}`);
+                if (navBtn) navBtn.classList.add('active');
+            }
+
+            if (tabId === 'calendario') { renderCalendario(); renderColores(); }
+            if (tabId === 'agenda-profesor') renderAgenda();
+        }
+
+        function toggleCustomTipo(selectId, inputId) {
+            const sel = document.getElementById(selectId);
+            const inp = document.getElementById(inputId);
+            if (!sel || !inp) return;
+            if (sel.value === '__custom__') {
+                inp.style.display = 'block';
+                inp.required = true;
+                inp.focus();
+            } else {
+                inp.style.display = 'none';
+                inp.required = false;
+                inp.value = '';
+            }
+        }
+
+        function getTipoValue(selectId, inputId) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return '';
+            if (sel.value === '__custom__') {
+                const inp = document.getElementById(inputId);
+                return (inp && inp.value.trim()) ? inp.value.trim() : 'Actividad personalizada';
+            }
+            return sel.value;
+        }
+
+        function updateTareaFecha(id, nuevaFecha) {
+            const t = db.tareas.find(x => x.id === id);
+            if (t) {
+                t.fecha = nuevaFecha;
+                saveData();
+                syncTareasToSheets();
+            }
+        }
+
+        function updateBorradorFecha(id, nuevaFecha) {
+            const b = db.borradores.find(x => x.id === id);
+            if (b) {
+                b.fecha = nuevaFecha;
+                saveData();
+            }
+        }
+
+        function addTarea(e) {
+            e.preventDefault();
+            const alumno = document.getElementById('tarea-alumno').value;
+            const tipo = getTipoValue('tarea-tipo', 'tarea-tipo-custom');
+            const fecha = document.getElementById('tarea-fecha').value;
+            const desc = document.getElementById('tarea-desc').value;
+
+            db.tareas.push({ id: Date.now(), alumno, tipo, fecha, desc });
+            document.getElementById('form-tarea').reset();
+            // Reset custom input visibility
+            document.getElementById('tarea-tipo-custom').style.display = 'none';
+            saveData();
+            syncTareasToSheets();
+        }
+
+        function deleteTarea(id) {
+            db.tareas = db.tareas.filter(t => t.id !== id);
+            saveData();
+            syncTareasToSheets();
+        }
+
+        function addMaterial(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('mat-titulo').value;
+            const cat = document.getElementById('mat-cat').value;
+            const url = document.getElementById('mat-url').value;
+
+            db.materiales.push({ id: Date.now(), titulo, cat, url });
+            document.getElementById('form-material').reset();
+            saveData();
+            syncMaterialesToSheets();
+        }
+
+        function deleteMaterial(id) {
+            db.materiales = db.materiales.filter(m => m.id !== id);
+            saveData();
+            syncMaterialesToSheets();
+        }
+
+        function deleteAlumno(id) {
+            if (!confirm('¿Eliminar este alumno de la plataforma? Esta acción no deshace el registro en Google Sheets.')) return;
+            db.alumnos = db.alumnos.filter(a => a.id !== id);
+            // También eliminar sus tareas asignadas individualmente
+            const alumno = db.alumnos.find(a => a.id === id);
+            saveData();
+        }
+
+        function togglePago(id) {
+            const alumno = db.alumnos.find(a => a.id === id);
+            if (alumno) {
+                alumno.pagoPagado = !alumno.pagoPagado;
+                saveData();
+            }
+        }
+
+        function updateMetodoPago(id, nuevoMetodo) {
+            const alumno = db.alumnos.find(a => a.id === id);
+            if (alumno) {
+                alumno.metodoPago = nuevoMetodo;
+                saveData();
+            }
+        }
+
+        function render() {
+            const numAlumnosElem = document.getElementById('num-alumnos');
+            if (numAlumnosElem) numAlumnosElem.textContent = db.alumnos.length;
+
+            const tAlumnos = document.getElementById('tabla-alumnos');
+            const tDashAlumnos = document.getElementById('tabla-dashboard-alumnos');
+            const selectTarea = document.getElementById('tarea-alumno');
+            const tPagos = document.getElementById('tabla-pagos');
+            const ultimoPagoDiv = document.getElementById('resumen-ultimo-pago');
+            
+            if (tAlumnos) tAlumnos.innerHTML = '';
+            if (tDashAlumnos) tDashAlumnos.innerHTML = '';
+            if (selectTarea) selectTarea.innerHTML = '<option value="Todos los Alumnos">Todos los Alumnos</option>';
+            if (tPagos) tPagos.innerHTML = '';
+
+            let ultimoPagado = null;
+
+            if (db.alumnos.length === 0) {
+                if (tAlumnos) tAlumnos.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Aún no hay alumnos registrados. Se registrarán automáticamente al crear su cuenta.</td></tr>`;
+                if (tDashAlumnos) tDashAlumnos.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Sin alumnos registrados por el momento.</td></tr>`;
+            } else {
+                db.alumnos.forEach((a, index) => {
+                    if (tAlumnos) {
+                        tAlumnos.innerHTML += `
+                            <tr>
+                                <td><strong>${a.nombre}</strong></td>
+                                <td>${a.email || '-'}</td>
+                                <td>${a.perfil || '-'}</td>
+                                <td><a href="https://wa.me/${a.tel}" target="_blank" style="color:var(--primary-light); text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> ${a.tel}</a></td>
+                                <td>
+                                    <button onclick="deleteAlumno(${a.id})" style="padding:0.35rem 0.7rem; cursor:pointer; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background: var(--danger-bg); color: var(--danger); font-weight:600;">
+                                        <i class="fa-solid fa-trash-can"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>`;
+                    }
+
+                    if (tDashAlumnos) {
+                        const statusBadge = a.pagoPagado 
+                            ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> Pagado</span>' 
+                            : '<span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pendiente</span>';
+                        tDashAlumnos.innerHTML += `
+                            <tr>
+                                <td><strong>${a.nombre}</strong></td>
+                                <td>${a.email || '-'}</td>
+                                <td>${a.perfil || '-'}</td>
+                                <td>${a.tel || '-'}</td>
+                                <td>${statusBadge}</td>
+                            </tr>`;
+                    }
+
+                    if (selectTarea) {
+                        selectTarea.innerHTML += `<option value="${a.nombre}">${a.nombre}</option>`;
+                    }
+
+                    if (tPagos) {
+                        const monto = index < 4 ? '180 €' : '240 €';
+                        const statusBadge = a.pagoPagado 
+                            ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> Pagado</span>' 
+                            : '<span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pendiente</span>';
+
+                        if (a.pagoPagado) ultimoPagado = a;
+
+                        tPagos.innerHTML += `
+                            <tr>
+                                <td><strong>${a.nombre}</strong></td>
+                                <td>Cuota Activa</td>
+                                <td><strong>${monto}</strong></td>
+                                <td>
+                                    <select onchange="updateMetodoPago(${a.id}, this.value)" style="padding:0.25rem; font-size:0.85rem;">
+                                        <option value="Bizum" ${a.metodoPago === 'Bizum' ? 'selected' : ''}>Bizum</option>
+                                        <option value="Transferencia" ${a.metodoPago === 'Transferencia' ? 'selected' : ''}>Transferencia</option>
+                                        <option value="Tarjeta" ${a.metodoPago === 'Tarjeta' ? 'selected' : ''}>Tarjeta</option>
+                                        <option value="Efectivo" ${a.metodoPago === 'Efectivo' ? 'selected' : ''}>Efectivo</option>
+                                    </select>
+                                </td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <button onclick="togglePago(${a.id})" style="padding:0.35rem 0.7rem; cursor:pointer; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); background: #f8fafc;">
+                                        Cambiar Estado
+                                    </button>
+                                </td>
+                            </tr>`;
+                    }
+                });
+            }
+
+            if (ultimoPagoDiv) {
+                if (ultimoPagado) {
+                    ultimoPagoDiv.innerHTML = `
+                        <div style="background: var(--accent-green-bg); padding: 0.85rem; border-radius: 8px; border: 1px solid #a7f3d0;">
+                            <span style="color: #065f46; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> ÚLTIMO PAGO REGISTRADO:</span><br>
+                            <span style="font-size:0.9rem;"><strong>${ultimoPagado.nombre}</strong> ha realizado su cuota mensual por <span class="badge badge-accent">${ultimoPagado.metodoPago || 'Bizum'}</span>.</span>
+                        </div>`;
+                } else {
+                    ultimoPagoDiv.innerHTML = `<p style="font-size:0.9rem; color:var(--text-muted);">No hay cobros confirmados este mes.</p>`;
+                }
+            }
+
+            const tTareas = document.getElementById('tabla-tareas');
+            if (tTareas) {
+                tTareas.innerHTML = '';
+                const tareasVisibles = db.tareas.filter(t => {
+                    if (!db.currentUser || db.currentUser.rol === 'profesor') return true;
+                    return t.alumno === db.currentUser.nombre || t.alumno === "Todos los Alumnos";
+                });
+
+                const esProfesor = db.currentUser && db.currentUser.rol === 'profesor';
+
+                if (tareasVisibles.length === 0) {
+                    tTareas.innerHTML = `<tr><td colspan="${esProfesor ? 5 : 4}" style="text-align:center; color: var(--text-muted); padding: 1.5rem;">No hay tareas asignadas programadas.</td></tr>`;
+                } else {
+                    tareasVisibles.forEach(t => {
+                        const fechaInput = esProfesor
+                            ? `<input type="date" class="fecha-editable" value="${t.fecha || ''}" title="Haz clic para cambiar la fecha" onchange="updateTareaFecha(${t.id}, this.value)">`
+                            : `<i class="fa-regular fa-calendar"></i> ${t.fecha || '-'}`;
+                        tTareas.innerHTML += `
+                            <tr>
+                                <td>${fechaInput}</td>
+                                <td><strong>${t.alumno}</strong></td>
+                                <td><span class="badge badge-info">${t.tipo}</span></td>
+                                <td>${t.desc || '-'}</td>
+                                ${esProfesor ? `<td><button onclick="deleteTarea(${t.id})" style="padding:0.35rem 0.7rem; cursor:pointer; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background: var(--danger-bg); color: var(--danger); font-weight:600;"><i class="fa-solid fa-trash-can"></i></button></td>` : ''}
+                            </tr>`;
+                    });
+                }
+            }
+
+            const tMat = document.getElementById('tabla-materiales');
+            if (tMat) {
+                tMat.innerHTML = '';
+                const esProf = db.currentUser && db.currentUser.rol === 'profesor';
+                if (db.materiales.length === 0) {
+                    tMat.innerHTML = `<tr><td colspan="${esProf ? 4 : 3}" style="text-align:center; color: var(--text-muted); padding: 1.5rem;">No hay materiales publicados aún.</td></tr>`;
+                } else {
+                    db.materiales.forEach(m => {
+                        tMat.innerHTML += `
+                            <tr>
+                                <td><strong>${m.titulo}</strong></td>
+                                <td><span class="badge badge-accent">${m.cat}</span></td>
+                                <td><a href="${m.url}" target="_blank" style="color: var(--primary-accent); font-weight:600; text-decoration:none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Material</a></td>
+                                ${esProf ? `<td><button onclick="deleteMaterial(${m.id})" style="padding:0.35rem 0.7rem; cursor:pointer; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background: var(--danger-bg); color: var(--danger); font-weight:600;"><i class="fa-solid fa-trash-can"></i> Eliminar</button></td>` : ''}
+                            </tr>`;
+                    });
+                }
+            }
+
+            // Actualiza el calendario si está visible
+            if (document.getElementById('calendario')?.classList.contains('active')) {
+                renderCalendario();
+                renderColores();
+            }
+
+            // Actualiza la agenda del profesor si está visible
+            if (document.getElementById('agenda-profesor')?.classList.contains('active')) {
+                renderAgenda();
+            } else {
+                // Siempre actualizar el select de alumnos en la agenda
+                const sel = document.getElementById('bor-alumno');
+                if (sel) {
+                    const current = sel.value;
+                    sel.innerHTML = '<option value="Todos los Alumnos">Todos los Alumnos</option>';
+                    db.alumnos.forEach(a => { sel.innerHTML += `<option value="${a.nombre}">${a.nombre}</option>`; });
+                    if (current) sel.value = current;
+                }
+            }
+        }
+        let calFecha = new Date();  // mes que se está mostrando
+
+        const CAL_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                           'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        const CAL_DIAS  = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+        // Colores predeterminados por tipo (fondo, texto, borde)
+        const COLOR_DEFAULTS = {
+            sesion:   { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' },
+            examen:   { bg: '#fef9c3', text: '#854d0e', border: '#eab308' },
+            minitest: { bg: '#dcfce7', text: '#166534', border: '#22c55e' },
+            otro:     { bg: '#f3e8ff', text: '#6b21a8', border: '#a855f7' }
+        };
+
+        // Paleta de swatches disponibles (color de borde/acento)
+        const SWATCHES = [
+            '#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899',
+            '#ef4444','#f97316','#eab308','#22c55e','#14b8a6',
+            '#06b6d4','#0ea5e9','#64748b','#f43f5e','#84cc16'
+        ];
+
+        function calTipoClase(tipo) {
+            if (!tipo) return 'otro';
+            const t = tipo.toLowerCase();
+            if (t.includes('sesión') || t.includes('sesion')) return 'sesion';
+            if (t.includes('examen')) return 'examen';
+            if (t.includes('minitest')) return 'minitest';
+            return 'otro';
+        }
+
+        // Devuelve el color hexadecimal acento guardado para un tipo (o el default)
+        function getColorHex(tipo) {
+            const key = tipo || '__otro__';
+            return db.colores[key] || null;
+        }
+
+        // Genera inline style para un chip de evento con el color personalizado
+        function colorStyle(tipo) {
+            const hex = getColorHex(tipo);
+            if (!hex) return ''; // usa clase CSS por defecto
+            // Derivar bg claro del color hex
+            const r = parseInt(hex.slice(1,3),16);
+            const g = parseInt(hex.slice(3,5),16);
+            const b = parseInt(hex.slice(5,7),16);
+            const bg = `rgba(${r},${g},${b},0.15)`;
+            return `style="background:${bg};color:${hex};border-left-color:${hex};"`;
+        }
+
+        function calTareasVisibles() {
+            if (!db.currentUser) return [];
+            if (db.currentUser.rol === 'profesor') return db.tareas;
+            return db.tareas.filter(t =>
+                t.alumno === db.currentUser.nombre || t.alumno === 'Todos los Alumnos'
+            );
+        }
+
+        function calCambiarMes(delta) {
+            calFecha = new Date(calFecha.getFullYear(), calFecha.getMonth() + delta, 1);
+            renderCalendario();
+        }
+
+        function renderCalendario() {
+            const grid  = document.getElementById('cal-grid');
+            const titulo = document.getElementById('cal-titulo');
+            const lista  = document.getElementById('cal-lista-eventos');
+            if (!grid || !titulo || !lista) return;
+
+            const year  = calFecha.getFullYear();
+            const month = calFecha.getMonth();
+            titulo.textContent = `${CAL_MESES[month]} ${year}`;
+
+            // Cabecera días de semana
+            let html = CAL_DIAS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+            // Primer día del mes (0=Dom → ajustamos a Lun=0)
+            const primerDia = new Date(year, month, 1);
+            let offset = primerDia.getDay() - 1;
+            if (offset < 0) offset = 6;
+
+            const diasMes    = new Date(year, month + 1, 0).getDate();
+            const diasAntMes = new Date(year, month, 0).getDate();
+            const hoy        = new Date();
+
+            const tareas = calTareasVisibles();
+
+            // Índice: fecha "YYYY-MM-DD" → array de tareas
+            const byDay = {};
+            tareas.forEach(t => {
+                if (!t.fecha) return;
+                byDay[t.fecha] = byDay[t.fecha] || [];
+                byDay[t.fecha].push(t);
+            });
+
+            // Celdas del mes anterior
+            for (let i = 0; i < offset; i++) {
+                const d = diasAntMes - offset + 1 + i;
+                html += `<div class="cal-cell other-month"><div class="cal-cell-num">${d}</div></div>`;
+            }
+
+            // Celdas del mes actual
+            for (let d = 1; d <= diasMes; d++) {
+                const mm   = String(month + 1).padStart(2, '0');
+                const dd   = String(d).padStart(2, '0');
+                const key  = `${year}-${mm}-${dd}`;
+                const isHoy = d === hoy.getDate() && month === hoy.getMonth() && year === hoy.getFullYear();
+                const eventos = byDay[key] || [];
+                const esProf = db.currentUser && db.currentUser.rol === 'profesor';
+                const clases = ['cal-cell', isHoy ? 'today' : '', eventos.length ? 'has-event' : '', esProf ? 'clickable' : ''].filter(Boolean).join(' ');
+                const clickAttr = esProf ? `onclick="qcOpen('${key}')"` : '';
+
+                let evHtml = eventos.map(t => {
+                    const cls = calTipoClase(t.tipo);
+                    const cs  = colorStyle(t.tipo);
+                    return `<div class="cal-event ${cs ? '' : cls}" ${cs}
+                        onmouseenter="calShowTip(event, ${t.id})"
+                        onmouseleave="calHideTip()"
+                        onclick="event.stopPropagation()">${t.tipo}</div>`;
+                }).join('');
+
+                html += `<div class="${clases}" ${clickAttr}><div class="cal-cell-num">${d}</div><div class="cal-events-wrap">${evHtml}</div></div>`;
+            }
+
+            // Celdas del mes siguiente para completar la cuadrícula
+            const totalCeldas = offset + diasMes;
+            const colas = totalCeldas % 7 === 0 ? 0 : 7 - (totalCeldas % 7);
+            for (let i = 1; i <= colas; i++) {
+                html += `<div class="cal-cell other-month"><div class="cal-cell-num">${i}</div></div>`;
+            }
+
+            grid.innerHTML = html;
+
+            // Lista de eventos del mes
+            const mm = String(month + 1).padStart(2, '0');
+            const eventosMes = tareas
+                .filter(t => t.fecha && t.fecha.startsWith(`${year}-${mm}`))
+                .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+            if (eventosMes.length === 0) {
+                lista.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:1.5rem;">Sin eventos este mes.</td></tr>`;
+            } else {
+                lista.innerHTML = eventosMes.map(t => {
+                    const [y, m, d] = t.fecha.split('-');
+                    const fechaFmt = `${d}/${m}/${y}`;
+                    const cls = calTipoClase(t.tipo);
+                    return `<tr>
+                        <td><i class="fa-regular fa-calendar"></i> <strong>${fechaFmt}</strong></td>
+                        <td>${t.alumno}</td>
+                        <td><span class="cal-event ${cls}" style="display:inline-flex;">${t.tipo}</span></td>
+                        <td>${t.desc || '—'}</td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        function calShowTip(e, tareaId) {
+            const t = db.tareas.find(x => x.id === tareaId);
+            if (!t) return;
+            const [y, m, d] = (t.fecha || '').split('-');
+            const tip = document.getElementById('cal-tooltip');
+            tip.innerHTML = `<strong>${t.tipo}</strong><br>👤 ${t.alumno}<br>📅 ${d}/${m}/${y}${t.desc ? '<br>📝 ' + t.desc : ''}`;
+            tip.classList.add('visible');
+            tip.style.left = (e.clientX + 12) + 'px';
+            tip.style.top  = (e.clientY + 12) + 'px';
+        }
+
+        function calHideTip() {
+            document.getElementById('cal-tooltip').classList.remove('visible');
+        }
+
+        // ── Fin Calendario ──────────────────────────────────────────
+
+        // ── Modal Creación Rápida desde Calendario ───────────────────
+
+        let qcFechaActual = '';
+        let qcModo = 'tarea'; // 'tarea' | 'borrador'
+
+        function qcOpen(fecha, modo = 'tarea') {
+            qcFechaActual = fecha;
+            qcModo = modo;
+            const [y, m, d] = fecha.split('-');
+            document.getElementById('qc-fecha-label').textContent = `${d}/${m}/${y}`;
+
+            // Título del header según modo
+            document.querySelector('#qc-modal .qc-header h3').innerHTML =
+                modo === 'borrador'
+                    ? '<i class="fa-solid fa-note-sticky"></i> Añadir borrador rápido'
+                    : '<i class="fa-solid fa-calendar-plus"></i> Crear tarea rápida';
+
+            // Mostrar/ocultar campo estado
+            document.getElementById('qc-estado-group').style.display = modo === 'borrador' ? 'flex' : 'none';
+
+            // Rellenar select de alumnos
+            const sel = document.getElementById('qc-alumno');
+            sel.innerHTML = '<option value="Todos los Alumnos">Todos los Alumnos</option>';
+            db.alumnos.forEach(a => { sel.innerHTML += `<option value="${a.nombre}">${a.nombre}</option>`; });
+
+            // Limpiar campos
+            document.getElementById('qc-tipo').value = 'Sesión Individual';
+            document.getElementById('qc-tipo-custom').style.display = 'none';
+            document.getElementById('qc-tipo-custom').value = '';
+            document.getElementById('qc-desc').value = '';
+            document.getElementById('qc-estado').value = 'idea';
+
+            // Historial: de tareas o de borradores según modo
+            const fuente = modo === 'borrador' ? db.borradores : db.tareas;
+            const hist = [];
+            const vistas = new Set();
+            [...fuente].reverse().forEach(t => {
+                const clave = `${t.tipo}||${t.alumno}||${t.desc || ''}`;
+                if (!vistas.has(clave)) {
+                    vistas.add(clave);
+                    hist.push({ tipo: t.tipo, alumno: t.alumno, desc: t.desc || '', estado: t.estado || 'idea' });
+                }
+            });
+
+            const histSection = document.getElementById('qc-hist-section');
+            const histList    = document.getElementById('qc-hist-list');
+
+            if (hist.length === 0) {
+                histSection.style.display = 'none';
+            } else {
+                histSection.style.display = 'block';
+                histList.innerHTML = hist.slice(0, 8).map((h, i) => {
+                    const cls = calTipoClase(h.tipo);
+                    const iconoMap = { sesion: 'fa-video', examen: 'fa-file-signature', minitest: 'fa-list-check', otro: 'fa-calendar' };
+                    const icono = iconoMap[cls] || 'fa-calendar';
+                    const alumnoLabel = h.alumno === 'Todos los Alumnos' ? '📢 Todos los alumnos' : h.alumno;
+                    return `<div class="qc-hist-item" onclick="qcAplicarHistorial(${i})">
+                        <div class="qc-hist-icon ${cls}"><i class="fa-solid ${icono}"></i></div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="qc-hist-title">${h.tipo}</div>
+                            <div class="qc-hist-sub">${alumnoLabel}${h.desc ? ' · ' + h.desc : ''}</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right qc-hist-arrow"></i>
+                    </div>`;
+                }).join('');
+                window._qcHist = hist;
+            }
+
+            document.getElementById('qc-overlay').classList.add('open');
+        }
+
+        function qcAplicarHistorial(idx) {
+            const h = window._qcHist[idx];
+            if (!h) return;
+            const [y, m, d] = qcFechaActual.split('-');
+
+            if (qcModo === 'borrador') {
+                db.borradores.push({ id: Date.now(), alumno: h.alumno, tipo: h.tipo, fecha: qcFechaActual, desc: h.desc, estado: h.estado || 'idea' });
+                saveData();
+                renderAgenda();
+            } else {
+                db.tareas.push({ id: Date.now(), alumno: h.alumno, tipo: h.tipo, fecha: qcFechaActual, desc: h.desc });
+                saveData();
+                syncTareasToSheets();
+                renderCalendario();
+            }
+
+            qcClose();
+            const msg = document.createElement('div');
+            msg.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#10b981;color:white;padding:0.75rem 1.2rem;border-radius:10px;font-weight:600;font-size:0.9rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:fadeIn 0.2s ease;';
+            msg.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${qcModo === 'borrador' ? 'Borrador' : 'Tarea'} añadido el ${d}/${m}/${y}`;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2800);
+        }
+
+        function qcGuardar() {
+            const alumno = document.getElementById('qc-alumno').value;
+            const tipo   = getTipoValue('qc-tipo', 'qc-tipo-custom');
+            const desc   = document.getElementById('qc-desc').value.trim();
+            const estado = document.getElementById('qc-estado').value;
+            if (!tipo) { alert('Indica el tipo de actividad.'); return; }
+            const [y, m, d] = qcFechaActual.split('-');
+
+            if (qcModo === 'borrador') {
+                db.borradores.push({ id: Date.now(), alumno, tipo, fecha: qcFechaActual, desc, estado });
+                saveData();
+                renderAgenda();
+            } else {
+                db.tareas.push({ id: Date.now(), alumno, tipo, fecha: qcFechaActual, desc });
+                saveData();
+                syncTareasToSheets();
+                renderCalendario();
+            }
+
+            qcClose();
+            const msg = document.createElement('div');
+            msg.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#10b981;color:white;padding:0.75rem 1.2rem;border-radius:10px;font-weight:600;font-size:0.9rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:fadeIn 0.2s ease;';
+            msg.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${qcModo === 'borrador' ? 'Borrador' : 'Tarea'} añadido el ${d}/${m}/${y}`;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2800);
+        }
+
+        function qcClose() {
+            document.getElementById('qc-overlay').classList.remove('open');
+            qcFechaActual = '';
+        }
+
+        function qcClickOutside(e) {
+            if (e.target === document.getElementById('qc-overlay')) qcClose();
+        }
+
+        // ── Fin Modal Creación Rápida ─────────────────────────────────
+
+        // ── Agenda Privada del Profesor ──────────────────────────────
+
+        let agdFecha = new Date();
+
+        function agdCambiarMes(delta) {
+            agdFecha = new Date(agdFecha.getFullYear(), agdFecha.getMonth() + delta, 1);
+            renderAgendaCal();
+        }
+
+        function addBorrador(e) {
+            e.preventDefault();
+            const alumno = document.getElementById('bor-alumno').value;
+            const tipo   = getTipoValue('bor-tipo', 'bor-tipo-custom');
+            const fecha  = document.getElementById('bor-fecha').value;
+            const desc   = document.getElementById('bor-desc').value;
+            const estado = document.getElementById('bor-estado').value;
+
+            db.borradores.push({ id: Date.now(), alumno, tipo, fecha, desc, estado });
+            document.getElementById('form-borrador').reset();
+            document.getElementById('bor-tipo-custom').style.display = 'none';
+            saveData();
+        }
+
+        function deleteBorrador(id) {
+            db.borradores = db.borradores.filter(b => b.id !== id);
+            saveData();
+        }
+
+        function publicarBorrador(id) {
+            const b = db.borradores.find(x => x.id === id);
+            if (!b) return;
+            if (!confirm(`¿Publicar esta tarea para ${b.alumno}?\nAparecerá en "Mis Tareas" y será visible para el alumno.`)) return;
+            db.tareas.push({ id: Date.now(), alumno: b.alumno, tipo: b.tipo, fecha: b.fecha, desc: b.desc });
+            db.borradores = db.borradores.filter(x => x.id !== id);
+            saveData();
+            syncTareasToSheets();
+            alert('✅ Tarea publicada correctamente en el Calendario de Tareas.');
+        }
+
+        function renderAgenda() {
+            // Rellenar select de alumnos en el form de borrador
+            const sel = document.getElementById('bor-alumno');
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = '<option value="Todos los Alumnos">Todos los Alumnos</option>';
+            db.alumnos.forEach(a => {
+                sel.innerHTML += `<option value="${a.nombre}">${a.nombre}</option>`;
+            });
+            if (current) sel.value = current;
+
+            // Lista de borradores
+            const lista = document.getElementById('lista-borradores');
+            const count = document.getElementById('agd-count');
+            if (!lista) return;
+
+            const sorted = [...db.borradores].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+
+            if (count) count.textContent = sorted.length ? `(${sorted.length})` : '';
+
+            if (sorted.length === 0) {
+                lista.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem; padding:1rem 0;">No hay borradores aún. ¡Empieza a planificar!</p>`;
+            } else {
+                const estadoLabels = {
+                    idea:  { cls: 'estado-idea',  icon: 'fa-lightbulb',      txt: 'Idea inicial' },
+                    plan:  { cls: 'estado-plan',  icon: 'fa-calendar-check', txt: 'Planificado'  },
+                    listo: { cls: 'estado-listo', icon: 'fa-circle-check',   txt: 'Listo'        }
+                };
+                const tipoIconos = {
+                    'Sesión Individual':  'fa-video',
+                    'Examen Oficial':     'fa-file-signature',
+                    'Minitest Refuerzo':  'fa-list-check',
+                    'Nota Personal':      'fa-sticky-note'
+                };
+                lista.innerHTML = sorted.map(b => {
+                    const est = estadoLabels[b.estado] || estadoLabels.idea;
+                    const icono = tipoIconos[b.tipo] || 'fa-calendar';
+                    return `
+                    <div class="borrador-card">
+                        <div class="borrador-icon"><i class="fa-solid ${icono}"></i></div>
+                        <div class="borrador-info">
+                            <div class="b-title">${b.tipo} — ${b.alumno}</div>
+                            <div class="b-meta">
+                                <i class="fa-regular fa-calendar"></i>
+                                <input type="date" class="bor-fecha-editable" value="${b.fecha || ''}" title="Haz clic para cambiar la fecha" onchange="updateBorradorFecha(${b.id}, this.value)">
+                                &nbsp;
+                                <span class="estado-badge ${est.cls}"><i class="fa-solid ${est.icon}"></i> ${est.txt}</span>
+                            </div>
+                            ${b.desc ? `<div class="b-desc">${b.desc}</div>` : ''}
+                        </div>
+                        <div class="borrador-actions">
+                            ${b.estado === 'listo' ? `<button class="btn-publicar" onclick="publicarBorrador(${b.id})"><i class="fa-solid fa-paper-plane"></i> Publicar</button>` : ''}
+                            <button class="btn-del-borrador" onclick="deleteBorrador(${b.id})"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            renderAgendaCal();
+        }
+
+        function renderAgendaCal() {
+            const grid   = document.getElementById('agd-cal-grid');
+            const titulo = document.getElementById('agd-titulo');
+            if (!grid || !titulo) return;
+
+            const year  = agdFecha.getFullYear();
+            const month = agdFecha.getMonth();
+            titulo.textContent = `${CAL_MESES[month]} ${year}`;
+
+            let html = CAL_DIAS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+            const primerDia = new Date(year, month, 1);
+            let offset = primerDia.getDay() - 1;
+            if (offset < 0) offset = 6;
+
+            const diasMes    = new Date(year, month + 1, 0).getDate();
+            const diasAntMes = new Date(year, month, 0).getDate();
+            const hoy        = new Date();
+
+            const byDay = {};
+            db.borradores.forEach(b => {
+                if (!b.fecha) return;
+                byDay[b.fecha] = byDay[b.fecha] || [];
+                byDay[b.fecha].push(b);
+            });
+
+            for (let i = 0; i < offset; i++) {
+                const d = diasAntMes - offset + 1 + i;
+                html += `<div class="agd-cal-cell other-month"><div class="agd-cal-cell-num">${d}</div></div>`;
+            }
+
+            for (let d = 1; d <= diasMes; d++) {
+                const mm   = String(month + 1).padStart(2, '0');
+                const dd   = String(d).padStart(2, '0');
+                const key  = `${year}-${mm}-${dd}`;
+                const isHoy = d === hoy.getDate() && month === hoy.getMonth() && year === hoy.getFullYear();
+                const eventos = byDay[key] || [];
+                const clases = ['agd-cal-cell', isHoy ? 'today' : '', 'clickable'].filter(Boolean).join(' ');
+
+                let evHtml = eventos.map(b => {
+                    const esCls = b.estado === 'listo' ? 'listo' : b.estado === 'plan' ? 'plan' : '';
+                    const cs = colorStyle(b.tipo);
+                    return `<div class="agd-ev ${cs ? '' : esCls}" ${cs} title="${b.tipo} — ${b.alumno}" onclick="event.stopPropagation()">${b.tipo}</div>`;
+                }).join('');
+
+                html += `<div class="${clases}" onclick="qcOpen('${key}', 'borrador')"><div class="agd-cal-cell-num">${d}</div><div class="agd-events-wrap">${evHtml}</div></div>`;
+            }
+
+            const totalCeldas = offset + diasMes;
+            const colas = totalCeldas % 7 === 0 ? 0 : 7 - (totalCeldas % 7);
+            for (let i = 1; i <= colas; i++) {
+                html += `<div class="agd-cal-cell other-month"><div class="agd-cal-cell-num">${i}</div></div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        // ── Fin Agenda Privada ───────────────────────────────────────
+
+        // ── Paleta de colores por tipo ───────────────────────────────
+
+        function renderColores() {
+            const card = document.getElementById('card-colores');
+            const lista = document.getElementById('lista-colores');
+            if (!card || !lista) return;
+
+            const esProf = db.currentUser && db.currentUser.rol === 'profesor';
+            card.style.display = esProf ? 'block' : 'none';
+            if (!esProf) return;
+
+            // Recoger todos los tipos únicos de tareas + borradores + defaults
+            const tiposSet = new Set(['Sesión Individual', 'Examen Oficial', 'Minitest Refuerzo']);
+            db.tareas.forEach(t => { if (t.tipo) tiposSet.add(t.tipo); });
+            db.borradores.forEach(b => { if (b.tipo) tiposSet.add(b.tipo); });
+            // Excluir el tipo "Nota Personal" que solo es de agenda interna
+            const tipos = [...tiposSet].filter(t => t !== 'Nota Personal');
+
+            lista.innerHTML = tipos.map(tipo => {
+                const hex = getColorHex(tipo) || getDefaultHex(tipo);
+                const r = parseInt(hex.slice(1,3),16);
+                const g = parseInt(hex.slice(3,5),16);
+                const b = parseInt(hex.slice(5,7),16);
+                const bg = `rgba(${r},${g},${b},0.15)`;
+                const swatchesHtml = SWATCHES.map(s => {
+                    const active = (getColorHex(tipo) === s) ? 'active' : '';
+                    return `<div class="swatch ${active}" style="background:${s};" title="${s}" onclick="setColor('${tipo}','${s}')"></div>`;
+                }).join('');
+
+                return `<div class="tipo-color-row">
+                    <div class="tipo-color-preview" style="background:${bg};border-left:4px solid ${hex};border-radius:6px;"></div>
+                    <div class="tipo-color-label">${tipo}</div>
+                    <div class="swatches">${swatchesHtml}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function getDefaultHex(tipo) {
+            const cls = calTipoClase(tipo);
+            const map = { sesion: '#3b82f6', examen: '#eab308', minitest: '#22c55e', otro: '#a855f7' };
+            return map[cls] || '#a855f7';
+        }
+
+        function setColor(tipo, hex) {
+            db.colores[tipo] = hex;
+            localStorage.setItem('app_colores', JSON.stringify(db.colores));
+            renderColores();
+            renderCalendario();
+            renderAgenda();
+        }
+
+        // ── Fin Paleta ───────────────────────────────────────────────
+
+        // Inicialización
+        loadAlumnosFromSheets();
+        setInterval(loadAlumnosFromSheets, 10000);
+        checkAuth();
+    </script>
+</body>
+</html>
