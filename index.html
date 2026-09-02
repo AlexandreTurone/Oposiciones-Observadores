@@ -598,9 +598,6 @@
             padding: 0.4rem 0.5rem;
             position: relative;
             transition: background 0.15s;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
         .cal-cell.other-month { opacity: 0.35; }
         .cal-cell.today { border-color: var(--primary-light); background: #eff6ff; }
@@ -610,34 +607,23 @@
             font-weight: 600;
             color: var(--text-muted);
             margin-bottom: 4px;
-            flex-shrink: 0;
         }
         .cal-cell.today .cal-cell-num { color: var(--primary-accent); }
-        .cal-events-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-            flex: 1;
-        }
         .cal-event {
             font-size: 0.7rem;
             font-weight: 600;
             border-radius: 4px;
             padding: 2px 5px;
+            margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
-            max-width: 100%;
-            display: block;
-            border-left: 3px solid transparent;
         }
-        /* Clases de fallback para colores predeterminados */
-        .cal-event.sesion   { background: #dbeafe; color: #1e40af; border-left-color: #3b82f6; }
-        .cal-event.examen   { background: #fef9c3; color: #854d0e; border-left-color: #eab308; }
-        .cal-event.minitest { background: #dcfce7; color: #166534; border-left-color: #22c55e; }
-        .cal-event.otro     { background: #f3e8ff; color: #6b21a8; border-left-color: #a855f7; }
+        .cal-event.sesion   { background: #dbeafe; color: #1e40af; }
+        .cal-event.examen   { background: #fef9c3; color: #854d0e; }
+        .cal-event.minitest { background: #dcfce7; color: #166534; }
+        .cal-event.otro     { background: #f3e8ff; color: #6b21a8; }
 
         /* ── Agenda del Profesor ── */
         .agenda-banner {
@@ -764,21 +750,18 @@
         .agd-cal-cell {
             min-height: 70px; background: #f9f7ff; border: 1px solid #e9d5ff;
             border-radius: 7px; padding: 0.35rem 0.4rem;
-            overflow: hidden; display: flex; flex-direction: column;
         }
         .agd-cal-cell.other-month { opacity: 0.3; }
         .agd-cal-cell.today { border-color: #7c3aed; background: #f3e8ff; }
-        .agd-cal-cell-num { font-size: 0.78rem; font-weight: 600; color: #6d28d9; margin-bottom: 3px; flex-shrink: 0; }
-        .agd-events-wrap { display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex: 1; }
+        .agd-cal-cell-num { font-size: 0.78rem; font-weight: 600; color: #6d28d9; margin-bottom: 3px; }
         .agd-ev {
             font-size: 0.68rem; font-weight: 600; border-radius: 3px;
-            padding: 1px 4px; background: #ede9fe;
+            padding: 1px 4px; margin-bottom: 2px; background: #ede9fe;
             color: #5b21b6; white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis; cursor: pointer; max-width: 100%; display: block;
-            border-left: 2px solid #7c3aed;
+            text-overflow: ellipsis; cursor: pointer;
         }
-        .agd-ev.listo { background: #dcfce7; color: #166534; border-left-color: #22c55e; }
-        .agd-ev.plan  { background: #dbeafe; color: #1e40af; border-left-color: #3b82f6; }
+        .agd-ev.listo { background: #dcfce7; color: #166534; }
+        .agd-ev.plan  { background: #dbeafe; color: #1e40af; }
 
         /* ── Modal Creación Rápida desde Calendario ── */
         #qc-overlay {
@@ -911,26 +894,6 @@
         }
         .cal-tooltip.visible { display: block; }
         .cal-tooltip strong { color: #93c5fd; }
-
-        /* ── Paleta de colores por tipo de tarea ── */
-        .tipo-color-row {
-            display: flex; align-items: center; gap: 0.75rem;
-            padding: 0.7rem 0; border-bottom: 1px solid var(--border);
-        }
-        .tipo-color-row:last-child { border-bottom: none; }
-        .tipo-color-preview {
-            width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0;
-            border: 2px solid rgba(0,0,0,0.08);
-        }
-        .tipo-color-label { flex: 1; font-weight: 600; font-size: 0.88rem; color: var(--text); }
-        .swatches { display: flex; gap: 5px; flex-wrap: wrap; }
-        .swatch {
-            width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
-            border: 2px solid transparent; transition: transform 0.12s;
-            flex-shrink: 0;
-        }
-        .swatch:hover { transform: scale(1.25); }
-        .swatch.active { border-color: #0f172a; box-shadow: 0 0 0 1px white inset; }
     </style>
 </head>
 <body>
@@ -1283,15 +1246,6 @@
                 </div>
             </header>
 
-            <!-- Color palette (solo profesor) -->
-            <div class="card only-profesor" id="card-colores" style="display:none;">
-                <h3><i class="fa-solid fa-palette"></i> Colores por tipo de actividad</h3>
-                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
-                    Asigna un color a cada tipo de actividad. Se aplica en ambos calendarios.
-                </p>
-                <div id="lista-colores"></div>
-            </div>
-
             <div class="card">
                 <div class="cal-nav">
                     <button class="cal-nav-btn" onclick="calCambiarMes(-1)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -1576,8 +1530,7 @@
             alumnos: JSON.parse(localStorage.getItem('app_alumnos_cache')) || [],
             tareas: JSON.parse(localStorage.getItem('app_tareas')) || [],
             materiales: JSON.parse(localStorage.getItem('app_materiales')) || [],
-            borradores: JSON.parse(localStorage.getItem('app_borradores')) || [],
-            colores: JSON.parse(localStorage.getItem('app_colores')) || {}
+            borradores: JSON.parse(localStorage.getItem('app_borradores')) || []
         };
 
         // ─────────────────────────────────────────────────────────────────────
@@ -1664,7 +1617,6 @@
             localStorage.setItem('app_tareas', JSON.stringify(db.tareas));
             localStorage.setItem('app_materiales', JSON.stringify(db.materiales));
             localStorage.setItem('app_borradores', JSON.stringify(db.borradores));
-            localStorage.setItem('app_colores', JSON.stringify(db.colores));
             render();
         }
 
@@ -1899,7 +1851,7 @@
                 if (navBtn) navBtn.classList.add('active');
             }
 
-            if (tabId === 'calendario') { renderCalendario(); renderColores(); }
+            if (tabId === 'calendario') renderCalendario();
             if (tabId === 'agenda-profesor') renderAgenda();
         }
 
@@ -2158,7 +2110,6 @@
             // Actualiza el calendario si está visible
             if (document.getElementById('calendario')?.classList.contains('active')) {
                 renderCalendario();
-                renderColores();
             }
 
             // Actualiza la agenda del profesor si está visible
@@ -2181,21 +2132,6 @@
                            'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
         const CAL_DIAS  = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
-        // Colores predeterminados por tipo (fondo, texto, borde)
-        const COLOR_DEFAULTS = {
-            sesion:   { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' },
-            examen:   { bg: '#fef9c3', text: '#854d0e', border: '#eab308' },
-            minitest: { bg: '#dcfce7', text: '#166534', border: '#22c55e' },
-            otro:     { bg: '#f3e8ff', text: '#6b21a8', border: '#a855f7' }
-        };
-
-        // Paleta de swatches disponibles (color de borde/acento)
-        const SWATCHES = [
-            '#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899',
-            '#ef4444','#f97316','#eab308','#22c55e','#14b8a6',
-            '#06b6d4','#0ea5e9','#64748b','#f43f5e','#84cc16'
-        ];
-
         function calTipoClase(tipo) {
             if (!tipo) return 'otro';
             const t = tipo.toLowerCase();
@@ -2203,24 +2139,6 @@
             if (t.includes('examen')) return 'examen';
             if (t.includes('minitest')) return 'minitest';
             return 'otro';
-        }
-
-        // Devuelve el color hexadecimal acento guardado para un tipo (o el default)
-        function getColorHex(tipo) {
-            const key = tipo || '__otro__';
-            return db.colores[key] || null;
-        }
-
-        // Genera inline style para un chip de evento con el color personalizado
-        function colorStyle(tipo) {
-            const hex = getColorHex(tipo);
-            if (!hex) return ''; // usa clase CSS por defecto
-            // Derivar bg claro del color hex
-            const r = parseInt(hex.slice(1,3),16);
-            const g = parseInt(hex.slice(3,5),16);
-            const b = parseInt(hex.slice(5,7),16);
-            const bg = `rgba(${r},${g},${b},0.15)`;
-            return `style="background:${bg};color:${hex};border-left-color:${hex};"`;
         }
 
         function calTareasVisibles() {
@@ -2287,14 +2205,14 @@
 
                 let evHtml = eventos.map(t => {
                     const cls = calTipoClase(t.tipo);
-                    const cs  = colorStyle(t.tipo);
-                    return `<div class="cal-event ${cs ? '' : cls}" ${cs}
+                    const label = t.tipo;
+                    return `<div class="cal-event ${cls}" 
                         onmouseenter="calShowTip(event, ${t.id})"
                         onmouseleave="calHideTip()"
-                        onclick="event.stopPropagation()">${t.tipo}</div>`;
+                        onclick="event.stopPropagation()">${label}</div>`;
                 }).join('');
 
-                html += `<div class="${clases}" ${clickAttr}><div class="cal-cell-num">${d}</div><div class="cal-events-wrap">${evHtml}</div></div>`;
+                html += `<div class="${clases}" ${clickAttr}><div class="cal-cell-num">${d}</div>${evHtml}</div>`;
             }
 
             // Celdas del mes siguiente para completar la cuadrícula
@@ -2620,11 +2538,10 @@
 
                 let evHtml = eventos.map(b => {
                     const esCls = b.estado === 'listo' ? 'listo' : b.estado === 'plan' ? 'plan' : '';
-                    const cs = colorStyle(b.tipo);
-                    return `<div class="agd-ev ${cs ? '' : esCls}" ${cs} title="${b.tipo} — ${b.alumno}" onclick="event.stopPropagation()">${b.tipo}</div>`;
+                    return `<div class="agd-ev ${esCls}" title="${b.tipo} — ${b.alumno}" onclick="event.stopPropagation()">${b.tipo}</div>`;
                 }).join('');
 
-                html += `<div class="${clases}" onclick="qcOpen('${key}', 'borrador')"><div class="agd-cal-cell-num">${d}</div><div class="agd-events-wrap">${evHtml}</div></div>`;
+                html += `<div class="${clases}" onclick="qcOpen('${key}', 'borrador')"><div class="agd-cal-cell-num">${d}</div>${evHtml}</div>`;
             }
 
             const totalCeldas = offset + diasMes;
@@ -2637,59 +2554,6 @@
         }
 
         // ── Fin Agenda Privada ───────────────────────────────────────
-
-        // ── Paleta de colores por tipo ───────────────────────────────
-
-        function renderColores() {
-            const card = document.getElementById('card-colores');
-            const lista = document.getElementById('lista-colores');
-            if (!card || !lista) return;
-
-            const esProf = db.currentUser && db.currentUser.rol === 'profesor';
-            card.style.display = esProf ? 'block' : 'none';
-            if (!esProf) return;
-
-            // Recoger todos los tipos únicos de tareas + borradores + defaults
-            const tiposSet = new Set(['Sesión Individual', 'Examen Oficial', 'Minitest Refuerzo']);
-            db.tareas.forEach(t => { if (t.tipo) tiposSet.add(t.tipo); });
-            db.borradores.forEach(b => { if (b.tipo) tiposSet.add(b.tipo); });
-            // Excluir el tipo "Nota Personal" que solo es de agenda interna
-            const tipos = [...tiposSet].filter(t => t !== 'Nota Personal');
-
-            lista.innerHTML = tipos.map(tipo => {
-                const hex = getColorHex(tipo) || getDefaultHex(tipo);
-                const r = parseInt(hex.slice(1,3),16);
-                const g = parseInt(hex.slice(3,5),16);
-                const b = parseInt(hex.slice(5,7),16);
-                const bg = `rgba(${r},${g},${b},0.15)`;
-                const swatchesHtml = SWATCHES.map(s => {
-                    const active = (getColorHex(tipo) === s) ? 'active' : '';
-                    return `<div class="swatch ${active}" style="background:${s};" title="${s}" onclick="setColor('${tipo}','${s}')"></div>`;
-                }).join('');
-
-                return `<div class="tipo-color-row">
-                    <div class="tipo-color-preview" style="background:${bg};border-left:4px solid ${hex};border-radius:6px;"></div>
-                    <div class="tipo-color-label">${tipo}</div>
-                    <div class="swatches">${swatchesHtml}</div>
-                </div>`;
-            }).join('');
-        }
-
-        function getDefaultHex(tipo) {
-            const cls = calTipoClase(tipo);
-            const map = { sesion: '#3b82f6', examen: '#eab308', minitest: '#22c55e', otro: '#a855f7' };
-            return map[cls] || '#a855f7';
-        }
-
-        function setColor(tipo, hex) {
-            db.colores[tipo] = hex;
-            localStorage.setItem('app_colores', JSON.stringify(db.colores));
-            renderColores();
-            renderCalendario();
-            renderAgenda();
-        }
-
-        // ── Fin Paleta ───────────────────────────────────────────────
 
         // Inicialización
         loadAlumnosFromSheets();
